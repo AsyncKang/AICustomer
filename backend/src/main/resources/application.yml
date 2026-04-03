@@ -1,0 +1,83 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: enterprise-cs
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/enterprise_cs?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    username: root
+    password: 12345678
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+
+logging:
+  pattern:
+    console: "%d{yyyy-MM-dd'T'HH:mm:ss.SSSXXX} [%thread] [%X{requestId}] [%X{userId}] %-5level %logger{36} - %msg%n"
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus,metrics
+  endpoint:
+    health:
+      show-details: when_authorized
+      probes:
+        enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name}
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        registerHealthIndicator: true
+    instances:
+      pythonAsk:
+        baseConfig: default
+        slidingWindowSize: 20
+        minimumNumberOfCalls: 8
+        failureRateThreshold: 50
+        waitDurationInOpenState: 30s
+      pythonIndex:
+        baseConfig: default
+        slidingWindowSize: 20
+        minimumNumberOfCalls: 8
+        failureRateThreshold: 50
+        waitDurationInOpenState: 30s
+  ratelimiter:
+    instances:
+      globalApi:
+        limitForPeriod: 200
+        limitRefreshPeriod: 1s
+        timeoutDuration: 0s
+
+app:
+  python-ai-url: http://127.0.0.1:8000/api/ask
+  python-health-url: http://127.0.0.1:8000/health
+  python-incremental-index-url: http://127.0.0.1:8000/api/index/incremental
+  python-delete-document-index-url: http://127.0.0.1:8000/api/index/document
+  python-index-rebuild-url: http://127.0.0.1:8000/api/index/rebuild
+  upload-dir: uploads
+  index:
+    max-retry-count: 5
+    retry-interval-minutes: 2
+    http-attempts: 3
+  jwt:
+    secret: "enterprise-cs-jwt-secret-please-change"
+    expire-minutes: 1440

@@ -1,0 +1,6 @@
+fastapi
+uvicorn
+requests
+pydantic
+PyMuPDF
+pymilvus>=2.4.0
