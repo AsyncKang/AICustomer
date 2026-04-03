@@ -1,5 +1,7 @@
 # 企业智能客服（AICustomer）
 
+仓库：<https://github.com/AsyncKang/AICustomer>
+
 基于私有知识库的 RAG 问答系统：支持多租户、文档上传与向量索引、智能对话与历史记录。前端为 Vue 3，后端为 Spring Boot，AI 与检索服务为 FastAPI（通义千问 + Milvus）。
 
 ## 技术栈
